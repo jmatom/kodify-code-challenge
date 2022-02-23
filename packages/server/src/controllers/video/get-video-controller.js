@@ -1,7 +1,9 @@
-const Video = require('../models/Video');
-const VideoViewedRecord = require('../models/VideoViewedRecord');
+'use strict';
 
-async function videoController(req, res) {
+const Video = require('../../models/Video');
+const VideoViewedRecord = require('../../models/VideoViewedRecord');
+
+async function getVideoController(req, res) {
     const { videoId } = req.params;
     const video = await Video.findOne({ videoId });
 
@@ -18,6 +20,4 @@ async function videoController(req, res) {
     }
 };
 
-module.exports = {
-    videoController,
-};
+module.exports = getVideoController;
