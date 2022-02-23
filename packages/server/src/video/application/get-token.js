@@ -2,24 +2,18 @@
 
 const crypto = require('crypto');
 
-/*
-const { performance, PerformanceObserver } = require('perf_hooks');
-
-const perfObserver = new PerformanceObserver((items) => {
-  items.getEntries().forEach((entry) => {
-    console.log(entry.duration);
-  });
-});
-
-perfObserver.observe({ entryTypes: ['measure'], buffer: true })
-*/
-
 /**
  * Create the use case / app service
  * @param {CdnRepository} cdnRepository
- * @returns {Function} app service
+ * @returns {Function} appService
  */
 function createAppService(cdnRepository) {
+  /**
+   * We are storing in memory the number of executions. If we need to make it
+   * distributed then we should go for a shared Redis between the instances
+   */
+  let executionNumberCounter = 0;
+
   /**
    * Generates a token and return a Video with the urls for each source having
    * the valid token be accessed
@@ -30,21 +24,17 @@ function createAppService(cdnRepository) {
       sources,
     } = videoDto;
 
-    // performance.mark('hash-start');
+    const cdn = cdnRepository.getCdnConfig(executionNumberCounter);
     const newSources = sources.map((source) => {
-      const cdnUrl = cdnRepository.getCdnUrl();
-      const cdnKey = cdnRepository.getCdnKey();
       // We are generating a token, this could be in a repo however with current requirements
       // I consider putting this logic here is enough
-      const token = crypto.createHash('md5').update(`${source.src}?secret=${cdnKey}`).digest('hex').toString();
+      const token = crypto.createHash('md5').update(`${source.src}?secret=${cdn.key}`).digest('hex').toString();
 
       return {
         ...source,
-        src: `${cdnUrl}${source.src}?token=${token}`,
+        src: `${cdn.address}${source.src}?token=${token}`,
       };
     });
-    // performance.mark('hash-end');
-    // performance.measure('generateHash', 'hash-start', 'hash-end');
 
     /**
      * We need to keep same format, after checking the code + reviewing package plyr:
@@ -54,6 +44,8 @@ function createAppService(cdnRepository) {
       ...videoDto,
       sources: newSources,
     };
+
+    executionNumberCounter = executionNumberCounter + 1;
 
     return videoWithTokenResponse;
   }

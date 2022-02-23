@@ -10,11 +10,11 @@
  * I went for option 2
  */
 
-const getTokenController = require('./get-token-controller');
+const createTokenController = require('./get-token-controller');
 const getVideoController = require('./get-video-controller');
 
 const videoController = {
-  getToken: getTokenController(),
+  createTokenController,
   getVideo: getVideoController,
 };
 

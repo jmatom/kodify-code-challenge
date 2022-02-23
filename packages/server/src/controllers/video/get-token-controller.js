@@ -56,6 +56,10 @@ function createTokenController() {
   
       await validateSchema(payload);
     } catch (e) {
+      /**
+       * To have better performance we can use pino but it's not working fine with this
+       * node 10.14.0 + pino 7.6.0 (indicating worker_threads is not available)
+       */
       console.error(e);
   
       /**
@@ -64,10 +68,24 @@ function createTokenController() {
       return res.status(400).send(e);
     }
   
-    const videoDto = req.body.video;
-    const videoWithTokenResponse = await getToken(videoDto);
-  
-    return res.send(videoWithTokenResponse);
+    try {
+      const videoDto = req.body.video;
+      const videoWithTokenResponse = await getToken(videoDto);
+
+      return res.send(videoWithTokenResponse);
+    } catch (e) {
+      /**
+       * The use case is not triggering business errors so if this code
+       * is reached then we will return a 500 error (https://jsonapi.org/format/#errors)
+       */
+      return res.status(500).send({
+        id: e.name,
+        status: "500",
+        code: 500,
+        title: e.message,
+        detail: e,
+      });
+    }
   }
 
   return getTokenController;

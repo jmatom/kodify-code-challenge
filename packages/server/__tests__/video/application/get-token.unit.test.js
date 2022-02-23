@@ -8,7 +8,7 @@ const {
 } = require('@jest/globals');
 
 const createGetToken = require('../../../src/video/application/get-token');
-const cdnRepository = require('../../../src/video/repositories/cdn-repository-in-memory');
+const CdnRepository = require('../../../src/video/repositories/cdn-repository-in-memory');
 
 describe('unit_test get_token_app_service', () => {
   test('should return a video with token param at each source', async () => {
@@ -32,15 +32,18 @@ describe('unit_test get_token_app_service', () => {
      * using invented key 1234
      * - For 1st source
      *  crypto.createHash('md5').update(`/Big_Buck_Bunny_1080p_surround_FrostWire.com.mp4?secret=1234`).digest('hex').toString();
-     *  token=0fae07ababe9612cdcd21909b046e4fe
+     *  token=a3b44a7c71a89adfb06cc383f8e00243
      * - For 2nd source
-     *  token=f3a7cbe7d56ad7b587fc7112f54d5ab7
+     *  token=38e67683cae0e1a71565b363fcaa13ef
      */
-    const cdnKey = '1234';
-    const cdnUrl = 'http://foo';
-    cdnRepository.getCdnUrl = jest.fn(() => cdnUrl);
-    cdnRepository.getCdnKey = jest.fn(() => cdnKey);
+    const availableCdns = [{
+      name: 'AWS TEST CDN 1',
+      address: 'https://foo.cloudfront.net',
+      key: '0000',
+    }];
+    const cdnRepository = new CdnRepository(availableCdns);
 
+    cdnRepository.getCdnConfig = jest.fn(() => availableCdns[0]);
     const getToken = createGetToken(cdnRepository);
 
     // Act
@@ -50,7 +53,7 @@ describe('unit_test get_token_app_service', () => {
     expect(videoWithTokenResponse._id).toBe('6213a7299fa2604f1b188ee0');
     expect(videoWithTokenResponse.videoId).toBe('12345');
     expect(videoWithTokenResponse.title).toBe('Big Buck Bunny');
-    expect(videoWithTokenResponse.sources[0].src).toBe(`${cdnUrl}/Big_Buck_Bunny_1080p_surround_FrostWire.com.mp4?token=0fae07ababe9612cdcd21909b046e4fe`);
-    expect(videoWithTokenResponse.sources[1].src).toBe(`${cdnUrl}/Big_Buck_Bunny_720p_surround_FrostWire.com.mp4?token=f3a7cbe7d56ad7b587fc7112f54d5ab7`);
+    expect(videoWithTokenResponse.sources[0].src).toBe(`${availableCdns[0].address}/Big_Buck_Bunny_1080p_surround_FrostWire.com.mp4?token=a3b44a7c71a89adfb06cc383f8e00243`);
+    expect(videoWithTokenResponse.sources[1].src).toBe(`${availableCdns[0].address}/Big_Buck_Bunny_720p_surround_FrostWire.com.mp4?token=38e67683cae0e1a71565b363fcaa13ef`);
   });
 });

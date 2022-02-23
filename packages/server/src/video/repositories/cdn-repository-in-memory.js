@@ -14,8 +14,24 @@
  * (https://12factor.net/config) or in a secure storage, at least for the keys
  * (vault for example, ciphered database, etc)
  */
- const CDN_ADDRESS = process.env.CDN_ADDRESS || 'https://d2usdis6r1u782.cloudfront.net';
- const CDN_KEY = process.env.CDN_KEY || 'U5e0IskwtIfA';
+
+ /**
+  * Hardcoding the info in memory
+  * Array of Cdn [{name, address, key}, ]
+  */
+const availableCdns = [{
+  name: 'AWS CDN 1',
+  address: 'https://d2usdis6r1u782.cloudfront.net',
+  key: 'U5e0IskwtIfA',
+}, {
+  name: 'AWS CDN 2',
+  address: 'https://d2oukvvww2uoq.cloudfront.net',
+  key: '9Weh3dv6QgDN',
+}, {
+  name: 'AWS CDN 1',
+  address: 'https://dbke9ww44or29.cloudfront.net',
+  key: '7x1vGkO75i1Y',
+}];
 
 class CdnRepositoryInMemory {
   /**
@@ -23,16 +39,22 @@ class CdnRepositoryInMemory {
    * we could expect an external store configuration , database connection,
    * vault connection, etc
    */
-  constructor() {
-    
+  /**
+   * @param {Array<Cdn>} cdns
+   */
+  constructor(cdns = availableCdns) {
+    this.cdns = cdns;
   }
 
-  getCdnUrl() {
-    return CDN_ADDRESS;
-  }
+  /**
+   * Get a cdn balanced based on the number of execution
+   * @param {Number} numberOfExecution
+   * @returns {Cdn}
+   */
+  getCdnConfig(numberOfExecution) {
+    const bucket = numberOfExecution % this.cdns.length;
 
-  getCdnKey() {
-    return CDN_KEY;
+    return this.cdns[bucket];
   }
 }
 

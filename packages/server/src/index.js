@@ -16,7 +16,7 @@ app.use(function setHeaders(req, res, next) {
 });
 
 app.get('/video/:videoId', videoController.getVideo);
-app.post('/video/token', videoController.getToken);
+app.post('/video/token', videoController.createTokenController());
 
 function startServer() {
     mongoose.connect('mongodb://mongo/db');
