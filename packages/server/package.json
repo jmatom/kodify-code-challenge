@@ -12,7 +12,7 @@
   },
   "scripts": {
     "start": "node_modules/.bin/nodemon src/index.js",
-    "test": "jest --inject-globals false"
+    "test": "jest --inject-globals false --detectOpenHandles --forceExit"
   },
   "bugs": {
     "url": "https://github.com/connorsmallman/kodify-technical-test/issues"

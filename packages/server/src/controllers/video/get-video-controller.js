@@ -25,6 +25,7 @@ function createVideoController(eventBus) {
         return res.status(404).send();
       }
 
+      console.error(e);
       /**
        * For unexpected errors, return a 500 error (https://jsonapi.org/format/#errors)
        */

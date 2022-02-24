@@ -7,7 +7,7 @@ const CdnRepository = require('../../video/infrastructure/cdn-repository-in-memo
 async function validateSchema(payload) {
   const sourcesSchema = Joi.object({
     src: Joi.string().trim().required(),
-    size: Joi.number().integer(),
+    size: Joi.number().integer().required(),
     type: Joi.string().trim().required(),
   });
 
@@ -15,7 +15,7 @@ async function validateSchema(payload) {
     _id: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
     videoId: Joi.string().trim().required(),
     title: Joi.string().trim().required(),
-    sources: Joi.array().items(sourcesSchema),
+    sources: Joi.array().required().items(sourcesSchema),
   });
 
   const videoRootSchema = Joi.object({
@@ -57,12 +57,6 @@ function createTokenController() {
       await validateSchema(payload);
     } catch (e) {
       /**
-       * To have better performance we can use pino but it's not working fine with this
-       * node 10.14.0 + pino 7.6.0 (indicating worker_threads is not available)
-       */
-      console.error(e);
-  
-      /**
        * TODO: Create a mapper to map joi validation error to a format error we want to send
        */
       return res.status(400).send(e);
@@ -74,6 +68,12 @@ function createTokenController() {
 
       return res.send(videoWithTokenResponse);
     } catch (e) {
+      /**
+       * To have better performance we can use pino to log error but it's not working fine with
+       * this node 10.14.0 + pino 7.6.0 (indicating worker_threads is not available)
+       */
+      console.error(e);
+
       /**
        * The use case is not triggering business errors so if this code
        * is reached then we will return a 500 error (https://jsonapi.org/format/#errors)

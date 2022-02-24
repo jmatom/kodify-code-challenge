@@ -1,15 +1,13 @@
 
 # https://jdlm.info/articles/2019/09/06/lessons-building-node-app-docker.html
-FROM node:10.14.0-alpine@sha256:b3e157beaf4f780f6e6ed058a438989afb0e5174b812c089e731b9f75b4db416
+FROM node:16.14.0-alpine
 
-RUN apk add --no-cache --quiet \
-    # npm
-    git=~2.18 \
-    # node-gyp
-    # https://github.com/nodejs/node-gyp/tree/v5.0.4#on-unix
-    g++=~6.4 \
-    make=~4.2 \
-    python=~2.7
+#RUN apk add --no-cache --quiet \
+#    git=~2.18 \
+#    g++=~6.4 \
+#    make=~4.2 \
+#    python=~2.7
+RUN apk add --no-cache --quiet git g++ make
 
 WORKDIR /srv/kodify-technical-test-server
 

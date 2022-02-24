@@ -7,8 +7,8 @@ const {
   jest,
 } = require('@jest/globals');
 
-const createGetToken = require('../../../src/video/application/get-token');
-const CdnRepository = require('../../../src/video/infrastructure/cdn-repository-in-memory');
+const createGetToken = require('../../../../src/video/application/get-token');
+const CdnRepository = require('../../../../src/video/infrastructure/cdn-repository-in-memory');
 
 describe('unit_test get_token_app_service', () => {
   test('should return a video with token param at each source', async () => {
