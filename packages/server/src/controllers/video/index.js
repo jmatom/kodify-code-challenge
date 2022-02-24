@@ -11,11 +11,11 @@
  */
 
 const createTokenController = require('./get-token-controller');
-const getVideoController = require('./get-video-controller');
+const createVideoFinderController = require('./get-video-controller');
 
 const videoController = {
   createTokenController,
-  getVideo: getVideoController,
+  createVideoFinderController,
 };
 
 module.exports = videoController;

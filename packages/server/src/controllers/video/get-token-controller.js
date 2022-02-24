@@ -2,7 +2,7 @@
 
 const Joi = require('joi');
 const createGetToken = require('../../video/application/get-token');
-const CdnRepository = require('../../video/repositories/cdn-repository-in-memory');
+const CdnRepository = require('../../video/infrastructure/cdn-repository-in-memory');
 
 async function validateSchema(payload) {
   const sourcesSchema = Joi.object({

@@ -17,7 +17,7 @@ function createAppService(cdnRepository) {
   /**
    * Generates a token and return a Video with the urls for each source having
    * the valid token be accessed
-   * @param {Object} videoDto Basic video data composed by
+   * @param {Object} videoDto
    */
   async function execute(videoDto) {
     const {

@@ -1,10 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const app = express();
-const port = 80;
-
 const videoController = require('./controllers/video');
+const EventBusInMemory = require('./video/infrastructure/event-bus-in-memory');
+const app = express();
+const eventBusInMemory = new EventBusInMemory();
+const port = 80;
 
 app.use(bodyParser.json());
 
@@ -15,8 +16,24 @@ app.use(function setHeaders(req, res, next) {
     next();
 });
 
-app.get('/video/:videoId', videoController.getVideo);
+/**
+ * Setup our routers
+ */
+app.get('/video/:videoId', videoController.createVideoFinderController(eventBusInMemory));
 app.post('/video/token', videoController.createTokenController());
+
+/**
+ * Setup our handlers to manager async flows/tasks
+ * We do not have a dependency container so we can create manually the dependencies here
+ */
+ (() => {
+    const VideoViewedRepositoryMongo = require('./video/infrastructure/video-viewed-repository-mongo');
+    const RegisterClientOnVideoViewed = require('./video/application/register-client-on-video-watched');
+    new RegisterClientOnVideoViewed(
+        new VideoViewedRepositoryMongo(),
+        eventBusInMemory
+    );
+})();
 
 function startServer() {
     mongoose.connect('mongodb://mongo/db');
